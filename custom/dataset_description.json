@@ -1,0 +1,13 @@
+{
+    "Name": "PIS III",
+    "BIDSVersion": "2.1.7",
+    "Authors": [
+      "nombre 1",
+      "Nombre 2"
+    ],
+    "ReferencesAndLinks": [
+      "https://example.com/paper1"
+    ],
+    "DatasetDOI": "Ejemplo"
+  }
+  

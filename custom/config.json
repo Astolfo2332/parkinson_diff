@@ -1,0 +1,58 @@
+{
+    "descriptions": [
+        {
+            "dataType": "anat",
+            "modalityLabel": "T1w",
+            "criteria": {
+                "MRAcquisitionType": "3D",
+                "SeriesDescription": "*T1*"
+            },
+            "ignore": [
+                "ManufacturerModelName",
+                "InstitutionAddress"
+            ]
+        },
+        {
+            "dataType": "func",
+            "modalityLabel": "bold",
+            "customLabels": "task-rest",
+            "CustomFields": {
+                "TaskName": "auditivo"
+              },
+            "criteria": {
+                "SeriesDescription": "*FE_EPI_AUDITIVO*",
+                "ProtocolName" : "*FE_EPI_AUDITIVO*"
+            },
+            "sidecarChanges": {
+                "TaskName": "auditivo"
+              },
+            "ignore": [
+                "ManufacturerModelName",
+                "InstitutionAddress"
+            ]
+        },
+        {
+            "dataType": "func",
+            "modalityLabel": "bold",
+            "customLabels":"task-rest",
+            "CustomFields": {
+                "TaskName": "visual"
+              },
+            "criteria": {
+                "SeriesDescription": "*FE_EPI_VISUAL*",
+                "ProtocolName": "FE_EPI_VISUAL"
+            },
+            "sidecarChanges": {
+                "TaskName": "visual"
+              },
+            "ignore": [
+                "ManufacturerModelName",
+                "InstitutionAddress"
+            ]
+        }
+    ],
+    "ignore": [
+        "ManufacturerModelName",
+        "InstitutionAddress"
+    ]
+}

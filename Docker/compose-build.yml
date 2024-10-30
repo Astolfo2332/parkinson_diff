@@ -1,0 +1,7 @@
+
+services:
+  fsl: 
+    build: 
+      context: ./fsl
+      dockerfile: dockerfile
+    image: fsl/parkinson_pipeline

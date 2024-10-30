@@ -1,0 +1,12 @@
+version: "1"
+
+services:
+  fsl: 
+    image: fsl/parkinson_pipeline
+    volumes:
+      - ./output:/output
+      - ./custom/parameters.json:/config/parameters.json
+networks:
+  my_network:
+    name: fsl_network
+
