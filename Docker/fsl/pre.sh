@@ -1,16 +1,24 @@
+#!/bin/bash
+
 if [ -z "$(ls -A /output)" ]; then \
         echo "Output directory is empty. Wait until dcm2bids finishes and run the compose again :_(" ;\
     else \
         echo "Starting preprocessing >:/" ;\
-        rm -rf output/tmp_dcm2bids && \
+
         for patient_dir in /output/sub-*; do \
             patient_num=$(basename $patient_dir); \
+            echo "Preprocessing ${patient_num}"; \
             if [ -d ${patient_dir}/anat ]; then \
+                echo "Preprocessing anat for patient ${patient_num}"; \
                 mkdir -p /output/derivatives/preprocessed/${patient_num}/anat && \
                 anat_new_value=$(jq -r '.anat.value' /config/parameters.json); \
                 for file in ${patient_dir}/anat/*.nii.gz*; do \
                     base=$(basename $file); \
                     bet $file /output/derivatives/preprocessed/${patient_num}/anat/${base%.nii.gz}_brain -f ${anat_new_value} -g 0; \
+                    flirt -in /output/derivatives/preprocessed/${patient_num}/anat/${base%.nii.gz}_brain \
+                                        -ref /usr/local/fsl/data/standard/MNI152_T1_2mm_brain \
+                                        -out /output/derivatives/preprocessed/${patient_num}/anat/${base%.nii.gz}_brain_registered \
+                                        -omat /output/derivatives/preprocessed/${patient_num}/anat/${base%.nii.gz}_brain_registered.mat
                 done; \
             fi; \
             if [ -d ${patient_dir}/func ]; then \

@@ -20,23 +20,23 @@ ENV LD_LIBRARY_PATH=${FSLDIR}/lib:$LD_LIBRARY_PATH
 
 RUN apt-get update && apt-get install -y jq
 
+RUN apt-get install -y coreutils
+
+RUN ln -sf /bin/bash /bin/sh 
+
+#Bash is better
+
+
 COPY pre.sh /app/pre.sh
-COPY pos.sh /app/pos.sh
 
-ENTRYPOINT [ "/bin/sh", "/app/pre.sh"]
+RUN chmod 777 /app/pre.sh
 
-
-
-
+#IMPORTANTE RECORDAR CAMBIAR PRE.SH A LF
+ENTRYPOINT ["app/pre.sh"]
 
 
+# Para mantener el contenedor corriendo
 
-
-
-
-
-    
-    
 
 
 
