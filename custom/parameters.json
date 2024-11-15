@@ -5,7 +5,7 @@
   "func": {
     "value": 0.6
   },
-  "post_processing": 1,
+  "post_processing": 0,
   "post_processed_parameters": {
     "volumes_erase": 3,
     "spatial_smoothing": 6,

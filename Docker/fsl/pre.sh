@@ -1,5 +1,7 @@
 #! bin/bash
 
+# Por el amor de dios recordar que esto debe ser LF y no CRLF!!!!!!!!!!!!
+
 if [ -z "$(ls -A /output)" ]; then 
     echo "Output directory is empty. Wait until dcm2bids finishes and run the compose again :_("
 else 
@@ -13,19 +15,26 @@ else
             echo "Processing session ${session_num}"
 
             if [ -d ${session_dir}/anat ]; then
+
                 mkdir -p /output/derivatives/preprocessed/${patient_num}/${session_num}/anat
                 anat_new_value=$(jq -r '.anat.value' /config/parameters.json)
                 for file in ${session_dir}/anat/*.nii.gz*; do
                     base=$(basename $file)
-                    echo "Cutting neck :/"
-                    robustfov -i $file -r /output/derivatives/preprocessed/${patient_num}/${session_num}/anat/${base%.nii.gz}_robust.nii.gz
+                    #echo "Cutting neck :/"
+                    #robustfov -i  $file -r /output/derivatives/preprocessed/${patient_num}/${session_num}/anat/${base%.nii.gz}_robust.nii.gz
                     echo "Skull stripping :C"
-                    bet /output/derivatives/preprocessed/${patient_num}/${session_num}/anat/${base%.nii.gz}_robust.nii.gz /output/derivatives/preprocessed/${patient_num}/${session_num}/anat/${base%.nii.gz}_brain -f ${anat_new_value} -g 0
+                    bet $file /output/derivatives/preprocessed/${patient_num}/${session_num}/anat/${base%.nii.gz}_brain -f ${anat_new_value} -g 0
+
                     echo "Registering to MNI :)"
-                    flirt -in /output/derivatives/preprocessed/${patient_num}/${session_num}/anat/${base%.nii.gz}_brain \
+                    flirt -in /output/derivatives/preprocessed/${patient_num}/${session_num}/anat/${base%.nii.gz}_brain\
                           -ref /usr/local/fsl/data/standard/MNI152_T1_2mm_brain \
                           -out /output/derivatives/preprocessed/${patient_num}/${session_num}/anat/${base%.nii.gz}_brain_registered \
-                          -omat /output/derivatives/preprocessed/${patient_num}/${session_num}/anat/${base%.nii.gz}_brain_registered.mat
+                          -omat /output/derivatives/preprocessed/${patient_num}/${session_num}/anat/${base%.nii.gz}_brain_registered.mat \
+                          -bins 256 \
+                          -cost corratio -searchrx -90 90 -searchry -90 90 -searchrz -90 90 -dof 12 \
+                          -interp trilinear
+                    
+                    echo "Finished UwU"
                 done
             fi 
             if [ -d ${patient_dir}/func ]; then \

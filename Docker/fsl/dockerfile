@@ -22,12 +22,16 @@ RUN apt-get update && apt-get install -y jq
 
 RUN apt-get install -y coreutils
 
+RUN apt-get install -y dos2unix
+
 RUN ln -sf /bin/bash /bin/sh 
 
 #Bash is better
 
 
 COPY pre.sh /app/pre.sh
+
+RUN dos2unix /app/pre.sh
 
 RUN chmod 777 /app/pre.sh
 
