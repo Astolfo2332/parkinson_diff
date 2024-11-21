@@ -82,6 +82,10 @@ def train(model: nn.Module, test_data: DataLoader, train_data: DataLoader, loss_
         "test_loss": [...],
         "test_acc": [...]}
     """
+
+    best_test_acc = 0
+    best_model = None
+
     results = {
         "train_loss": [],
         "train_acc": [],
@@ -105,6 +109,8 @@ def train(model: nn.Module, test_data: DataLoader, train_data: DataLoader, loss_
         results["test_loss"].append(test_loss)
         results["test_acc"].append(test_acc)
 
+
+
         ##Add of the writer
         if writer:
             writer.add_scalars(main_tag="Loss", 
@@ -118,7 +124,12 @@ def train(model: nn.Module, test_data: DataLoader, train_data: DataLoader, loss_
             )
 
             writer.close()
-    return results
+        # Para guardar el mejor modelo
+        if test_acc > best_test_acc:
+            best_test_acc = train_acc
+            best_model = model.state_dict()
+
+    return results, best_model, best_test_acc
 
 def create_write(name: str, model: str, extra: str=None) -> SummaryWriter():
 

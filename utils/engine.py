@@ -26,7 +26,7 @@ def train_func(model: nn.Module, data: torch.utils.data.DataLoader, loss_fn:nn.M
         loss.backward()
         optimizer.step()
         y_pred = torch.softmax(y_logit, 1).argmax(1)
-        train_acc += (y_pred == y).sum().item() / len (y_pred) 
+        train_acc += (y_pred == y).sum().item() / len (y_pred)
     train_loss = train_loss / len(data)
     train_acc = train_acc / len(data)
     return train_loss, train_acc
