@@ -7,8 +7,6 @@ from torch.utils.tensorboard import SummaryWriter
 from tqdm.auto import tqdm
 from datetime import datetime
 from utils.engine import train_func, test_func
-from utils.engine import set_seed
-
 
 def train_func_profiler(model: nn.Module, data: DataLoader, loss_fn:nn.Module,
                optimizer: torch.optim.Optimizer, device: torch.device
@@ -131,3 +129,11 @@ def create_write(name: str, model: str, extra: str=None) -> SummaryWriter():
         log_dir = os.path.join("runs", timestamp, name, model)
     print(f"[INFO] create summary writer, saving to: {log_dir}")
     return SummaryWriter(log_dir=log_dir)
+
+def select_optimizer(model: nn.Module, optimizer: str):
+    if optimizer == "Adam":
+        return torch.optim.Adam(model.parameters(), lr=0.001)
+    if optimizer == "SGD": 
+        return torch.optim.SGD(model.parameters(), lr=0.001)
+    if optimizer == "Adamw":
+        return torch.optim.AdamW(model.parameters(), lr=0.001)
