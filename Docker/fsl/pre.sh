@@ -5,7 +5,38 @@
 if [ -z "$(ls -A /output)" ]; then 
     echo "Output directory is empty. Wait until dcm2bids finishes and run the compose again :_("
 else 
-        echo "Starting preprocessing >:/" ;
+
+        anat_new_value=$(jq -r '.anat.value' /config/parameters.json)
+        echo "Starting preprocessing >:/";
+        echo "First, the brain only UwU";
+
+        for patient_dir in /output/derivatives/sub-*; do
+            patient_num=$(basename $patient_dir)
+            echo "Preprocessing ${patient_dir}"
+
+            for session_dir in ${patient_dir}/ses-*; do
+                session_num=$(basename $session_dir)
+                echo "Processing session ${session_num}"
+
+                if [ -d ${session_dir}/anat ]; then
+
+                    mkdir -p /output/derivatives/preprocessed/${patient_num}/${session_num}/anat
+                    for file in ${session_dir}/anat/*.nii.gz*; do
+                        base=$(basename $file)
+                        echo "Registering to MNI :)"
+                        flirt -in $file \
+                              -ref /usr/local/fsl/data/standard/MNI152_T1_2mm_brain \
+                              -out /output/derivatives/preprocessed/${patient_num}/${session_num}/anat/${base%.nii.gz}_brain_registered \
+                              -omat /output/derivatives/preprocessed/${patient_num}/${session_num}/anat/${base%.nii.gz}_brain_registered.mat \
+                              -bins 256 \
+                              -cost corratio -searchrx -90 90 -searchry -90 90 -searchrz -90 90 -dof 12 \
+                              -interp trilinear
+                        echo "Finished UwU"
+                    done
+                fi
+            done    
+        done
+
        for patient_dir in /output/sub-*; do
         patient_num=$(basename $patient_dir)
         echo "Preprocessing ${patient_dir}"
@@ -17,7 +48,6 @@ else
             if [ -d ${session_dir}/anat ]; then
 
                 mkdir -p /output/derivatives/preprocessed/${patient_num}/${session_num}/anat
-                anat_new_value=$(jq -r '.anat.value' /config/parameters.json)
                 for file in ${session_dir}/anat/*.nii.gz*; do
                     base=$(basename $file)
                     #echo "Cutting neck :/"
