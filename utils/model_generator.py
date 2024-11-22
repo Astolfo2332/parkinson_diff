@@ -1,5 +1,19 @@
 import torch
 from torch import nn
+from efficientnet_pytorch_3d import EfficientNet3D
+
+def get_model(model_name: str) -> nn.Module:
+
+    if model_name == "tinyvgg":
+        model = TinyVGG(input_shape=1, hidden_units=64, output_shape=2)
+        return model
+    
+    model = EfficientNet3D.from_name(f"{model_name}", override_params={'num_classes': 2}, in_channels=1)
+    return model
+        
+
+
+
 
 
 class TinyVGG(nn.Module):
@@ -36,8 +50,8 @@ class TinyVGG(nn.Module):
             nn.Flatten(),
             # Where did this in_features shape come from? 
             # It's because each layer of our network compresses and changes the shape of our inputs data.
-            nn.LayerNorm((836352,), elementwise_affine=False, eps=1e-5),
-            nn.Linear(in_features= 836352,
+            nn.LayerNorm((7683200,), elementwise_affine=False, eps=1e-5),
+            nn.Linear(in_features= 7683200,
                       out_features=output_shape)
         )
     

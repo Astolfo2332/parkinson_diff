@@ -8,7 +8,7 @@ def pipeline(output_folder):
     print("Normalización finalizada")
 
     print("Creando dataloaders")
-    train_loader, test_loader = load_data(output_folder, 2)
+    train_loader, test_loader = load_data(output_folder, 1)
     print("Dataloaders creados")
 
     print("Iniciando entrenamiento")

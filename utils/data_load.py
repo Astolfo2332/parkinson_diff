@@ -3,6 +3,7 @@ import numpy as np
 import torch
 from torch.utils.data import DataLoader
 from utils.normalización import search_paths
+import torch.nn.functional as F
 
 
 
@@ -20,8 +21,11 @@ class BrainDataset(torch.utils.data.Dataset):
         label = self.labels[idx]
         image = nib.load(image_path).get_fdata()
         image = image.astype(np.float32)
+        #Probar
         image = np.expand_dims(image, axis=0)
         image = torch.tensor(image)
+        image = F.pad(image, (54, 54, 46, 47, 54, 54))
+        #image = F.interpolate(image, size=(200, 91), mode='bilinear', align_corners=False)
         if self.transform:
             image = self.transform(image)
         return image, label

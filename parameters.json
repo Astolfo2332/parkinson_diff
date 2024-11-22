@@ -1,4 +1,5 @@
 {
     "epochs": [1],
-    "optimizers": ["Adam", "SGD", "Adamw"]
+    "optimizers": ["Adam", "SGD", "Adamw"],
+    "models": ["efficientnet-b0", "efficientnet-b7", "tinyvgg"]
 }
