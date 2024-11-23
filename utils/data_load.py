@@ -48,11 +48,12 @@ class BalancedBrainDataset(torch.utils.data.Dataset):
 #         return image, label
 
 class BrainDataset(torch.utils.data.Dataset):
-    def __init__(self, file_paths, labels, transform=None, augmentation_transform=None):
+    def __init__(self, file_paths, labels, transform=None, augmentation_transform=None, augmentation=False):
         self.file_paths = file_paths
         self.labels = labels
         self.transform = transform
         self.augmentation_transform = augmentation_transform
+        self.augmentation = augmentation
 
     def __len__(self):
         return len(self.file_paths)
@@ -65,16 +66,16 @@ class BrainDataset(torch.utils.data.Dataset):
         image = np.expand_dims(image, axis=0)
         image = torch.tensor(image)
         #image = F.pad(image, (54, 54, 46, 47, 54, 54))
-        if label == 0 and self.augmentation_transform:
+        if label == 0 and self.augmentation_transform and self.augmentation:
             augmented_image = self.augmentation_transform(image)
             return [(image, label), (augmented_image, label)]
         if self.transform:
             image = self.transform(image)
         return image, label
 
-def load_data(output_path: str, batch_size: int, train: int = 0.7, transform=None):
+def load_data(output_path: str, batch_size: int, train: int = 0.7, transform=None, augmentation=True, all_data=False):
 
-    files = search_paths(output_path, "brain_normalized.nii.gz")
+    files = search_paths(output_path, "brain_normalized.nii.gz", all_data)
     labels =[0 if "RC41" in file else 1 for file in files] #Se toman los labels como dice la documentación de estos
 
     augmentation_transform = transforms.Compose([
@@ -85,11 +86,12 @@ def load_data(output_path: str, batch_size: int, train: int = 0.7, transform=Non
 
     brain_dataset = BrainDataset(files, labels, augmentation_transform=augmentation_transform)
     #Duplicamos las imagenes... No es lo mejor pero xd
-    balanced_brain_dataset = BalancedBrainDataset(brain_dataset)
+    if not augmentation:
+        brain_dataset = BalancedBrainDataset(brain_dataset)
     
-    train_size = int(train * len(balanced_brain_dataset))
-    test_size = len(balanced_brain_dataset) - train_size
-    train_dataset, test_dataset = torch.utils.data.random_split(balanced_brain_dataset, [train_size, test_size])
+    train_size = int(train * len(brain_dataset))
+    test_size = len(brain_dataset) - train_size
+    train_dataset, test_dataset = torch.utils.data.random_split(brain_dataset, [train_size, test_size], generator=torch.Generator().manual_seed(23))
     train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
     test_loader = DataLoader(test_dataset, batch_size=batch_size, shuffle=True)
 

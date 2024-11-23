@@ -104,6 +104,7 @@ def train(model: nn.Module, test_data: DataLoader, train_data: DataLoader, loss_
     """
 
     best_test_acc = 0
+    best_train_loss = 1000
     best_model = None
 
     results = {
@@ -143,25 +144,26 @@ def train(model: nn.Module, test_data: DataLoader, train_data: DataLoader, loss_
             global_step=epoch
             )
             if epoch == epochs - 1:
-                cm = confusion_matrix(test_preds, test_labels, title)
-                cm_fig = plot_confusion_matrix(cm, ["Control", "Parkinson"])
+                cm = confusion_matrix(test_preds, test_labels)
+                cm_fig = plot_confusion_matrix(cm, ["Control", "Parkinson"], title)
                 writer.add_figure("Confusion Matrix", cm_fig, global_step=epoch)
 
             writer.close()
         # Para guardar el mejor modelo
-        if test_acc > best_test_acc:
+        if test_acc > best_test_acc and train_loss < best_train_loss:
             best_test_acc = train_acc
+            best_train_loss = train_loss
             best_model = model.state_dict()
 
-    return results, best_model, best_test_acc
+    return results, best_model, best_test_acc, cm_fig, train_loss
 
-def create_write(name: str, model: str, extra: str=None) -> SummaryWriter():
+def create_write(name: str, model: str, experiment_name: str,extra: str=None) -> SummaryWriter():
 
     timestamp = datetime.now().strftime("%Y-%m-%d")
     if extra:
-        log_dir = os.path.join("runs", timestamp, name, model, extra)
+        log_dir = os.path.join("runs", timestamp, experiment_name, name, model, extra)
     else:
-        log_dir = os.path.join("runs", timestamp, name, model)
+        log_dir = os.path.join("runs", timestamp, experiment_name, name, model)
     print(f"[INFO] create summary writer, saving to: {log_dir}")
     return SummaryWriter(log_dir=log_dir)
 

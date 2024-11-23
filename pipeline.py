@@ -11,8 +11,10 @@ def pipeline(output_folder):
     train_loader, test_loader = load_data(output_folder, 8)
     print("Dataloaders creados")
 
+    with open("parameters.json", "r",encoding="utf-8") as file:
+        parameters = json.load(file)
     print("Iniciando entrenamiento")
-    run_experiments(test_loader, train_loader)
+    run_experiments(test_loader, train_loader, parameters)
     print("Entrenamiento finalizado")
 
     return
