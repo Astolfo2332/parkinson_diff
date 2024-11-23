@@ -4,7 +4,6 @@ from monai.transforms import ScaleIntensity, NormalizeIntensity, Compose
 import torch
 
 # Definir el pipeline de transformaciones
-transform = Compose([ScaleIntensity(minv=0.0, maxv=1.0),NormalizeIntensity(nonzero=True)])
 
 def search_paths(base_path, pattern):
     rutas = []

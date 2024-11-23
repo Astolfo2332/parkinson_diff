@@ -31,7 +31,7 @@ class BrainDataset(torch.utils.data.Dataset):
         return image, label
     
 
-def load_data(output_path: str, batch_size: int, train: int = 0.7, transform=None,):
+def load_data(output_path: str, batch_size: int, train: int = 0.7, transform=None):
 
     files = search_paths(output_path, "brain_normalized.nii.gz")
     labels =[0 if "RC41" in file else 1 for file in files] #Se toman los labels como dice la documentación de estos
