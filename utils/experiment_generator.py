@@ -42,7 +42,7 @@ def run_experiments(test_dataloader: DataLoader, train_dataloader: DataLoader):
                 #log_dir = os.path.join("log", timestamp + optimizer + name + str(epochs))
                 optimizer = select_optimizer(model, optimizer_name)
                 results, best_model, test_acc = train(model, test_dataloader, train_dataloader, loss_fn, optimizer, device,
-                epochs, writer)
+                epochs, writer, model_name + "/" + optimizer_name)
                 print("-" * 50 + "\n")
 
                 if test_acc > best_test_acc:

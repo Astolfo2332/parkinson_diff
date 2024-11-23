@@ -7,6 +7,22 @@ from torch.utils.tensorboard import SummaryWriter
 from tqdm.auto import tqdm
 from datetime import datetime
 from utils.engine import train_func, test_func
+import matplotlib.pyplot as plt
+from sklearn.metrics import confusion_matrix
+import seaborn as sns
+
+def plot_confusion_matrix(cm, class_names,title):
+    """
+    Plots the confusion matrix using seaborn.
+    """
+    fig, ax = plt.subplots(figsize=(10, 10))
+    sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', xticklabels=class_names, yticklabels=class_names)
+    plt.title(title)
+    plt.ylabel('Actual')
+    plt.xlabel('Predicted')
+    plt.close(fig)
+    return fig
+
 
 def train_func_profiler(model: nn.Module, data: DataLoader, loss_fn:nn.Module,
                optimizer: torch.optim.Optimizer, device: torch.device
@@ -32,6 +48,8 @@ def train_func_profiler(model: nn.Module, data: DataLoader, loss_fn:nn.Module,
 
     model.train()
     train_loss, train_acc = 0, 0
+    all_preds = []
+    all_labels = []
     with torch.profiler.profile(
         schedule=torch.profiler.schedule(
             wait=1,
@@ -53,14 +71,16 @@ def train_func_profiler(model: nn.Module, data: DataLoader, loss_fn:nn.Module,
             profiler.step()
             y_pred = torch.softmax(y_logit, 1).argmax(1)
             train_acc += (y_pred == y).sum().item() / len (y_pred)
+            all_preds.extend(y_pred.cpu().numpy())
+            all_labels.extend(y.cpu().numpy())
             #We can use another function if we want
     train_loss = train_loss / len(data)
     train_acc = train_acc / len(data)
-    return train_loss, train_acc
+    return train_loss, train_acc, all_preds, all_labels
 
 def train(model: nn.Module, test_data: DataLoader, train_data: DataLoader, loss_fn:nn.Module,
         optimizer: torch.optim.Optimizer, device: torch.device, epochs: int
-        , writer: SummaryWriter) -> Dict[str, List]:
+        , writer: SummaryWriter, title: str) -> Dict[str, List]:
     """
     Trains and test a Pytorch model
 
@@ -93,9 +113,9 @@ def train(model: nn.Module, test_data: DataLoader, train_data: DataLoader, loss_
         "test_acc": []
     }
     for epoch in tqdm(range(epochs)):
-        train_loss, train_acc = train_func(
+        train_loss, train_acc,train_preds, train_labes = train_func(
             model,train_data,loss_fn,optimizer, device)
-        test_loss, test_acc = test_func(
+        test_loss, test_acc, test_preds, test_labels = test_func(
             model, test_data, loss_fn, device)
         print(
             f"Epoch {epoch+1} |"
@@ -122,6 +142,10 @@ def train(model: nn.Module, test_data: DataLoader, train_data: DataLoader, loss_
             tag_scalar_dict={"train_acc": train_acc, "tests_acc": test_acc},
             global_step=epoch
             )
+            if epoch == epochs - 1:
+                cm = confusion_matrix(test_preds, test_labels, title)
+                cm_fig = plot_confusion_matrix(cm, ["Control", "Parkinson"])
+                writer.add_figure("Confusion Matrix", cm_fig, global_step=epoch)
 
             writer.close()
         # Para guardar el mejor modelo
@@ -144,7 +168,7 @@ def create_write(name: str, model: str, extra: str=None) -> SummaryWriter():
 def select_optimizer(model: nn.Module, optimizer: str):
     if optimizer == "Adam":
         return torch.optim.Adam(model.parameters(), lr=0.001)
-    if optimizer == "SGD": 
+    if optimizer == "SGD":
         return torch.optim.SGD(model.parameters(), lr=0.001)
     if optimizer == "Adamw":
         return torch.optim.AdamW(model.parameters(), lr=0.001)
