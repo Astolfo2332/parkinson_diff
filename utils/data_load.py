@@ -24,7 +24,7 @@ class BrainDataset(torch.utils.data.Dataset):
         #Probar
         image = np.expand_dims(image, axis=0)
         image = torch.tensor(image)
-        image = F.pad(image, (54, 54, 46, 47, 54, 54))
+        #image = F.pad(image, (54, 54, 46, 47, 54, 54))
         #image = F.interpolate(image, size=(200, 91), mode='bilinear', align_corners=False)
         if self.transform:
             image = self.transform(image)
