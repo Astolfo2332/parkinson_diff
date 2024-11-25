@@ -48,12 +48,13 @@ class BalancedBrainDataset(torch.utils.data.Dataset):
 #         return image, label
 
 class BrainDataset(torch.utils.data.Dataset):
-    def __init__(self, file_paths, labels, transform=None, augmentation_transform=None, augmentation=False):
+    def __init__(self, file_paths, labels, transform=None, augmentation_transform=None, augmentation=False, inference=False):
         self.file_paths = file_paths
         self.labels = labels
         self.transform = transform
         self.augmentation_transform = augmentation_transform
         self.augmentation = augmentation
+        self.inference = inference
 
     def __len__(self):
         return len(self.file_paths)
@@ -71,6 +72,8 @@ class BrainDataset(torch.utils.data.Dataset):
             return [(image, label), (augmented_image, label)]
         if self.transform:
             image = self.transform(image)
+        if self.inference:
+            return image
         return image, label
 
 def load_data(output_path: str, batch_size: int, train: int = 0.7, transform=None, augmentation=True, all_data=False):

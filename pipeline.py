@@ -1,12 +1,19 @@
 from utils.normalización import normalice_and_save
 from utils.data_load import load_data
 from utils.experiment_generator import run_experiments
+from utils.inference import inference_data
 import json
 
-def pipeline(output_folder):
+def pipeline(output_folder, inference_path):
     with open("parameters.json", "r",encoding="utf-8") as file:
         parameters = json.load(file)
     
+    if parameters["inference"]:
+        print("Iniciando inferencia")
+        inference_data(inference_path)
+        print("Inferencia finalizada")
+        return
+
     print("Iniciando normalización")
     normalice_and_save(output_folder)
     print("Normalización finalizada")
@@ -38,5 +45,6 @@ def pipeline(output_folder):
 
 if __name__ == "__main__":
     OUTPUT_PATH = "output/"
+    INFERENCE_PATH = "inference/"
 
-    pipeline(OUTPUT_PATH)
+    pipeline(OUTPUT_PATH, INFERENCE_PATH)

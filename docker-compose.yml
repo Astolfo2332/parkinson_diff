@@ -5,6 +5,14 @@ services:
     volumes:
       - ./output:/output
       - ./custom/parameters.json:/config/parameters.json
+  python:
+    image: python/parkinson_pipeline
+    volumes:
+      - ./output:/app/output
+      - ./models:/app/models
+      - ./inference:/app/inference
+    depends_on:
+      - fsl
 networks:
   my_network:
     name: fsl_network

@@ -125,11 +125,11 @@ class PreprocessInput(nn.Module):
 
 
     def forward(self, x):
-        x = self.conv_block_1(x)  # (1, 91, 106, 91) -> (3, 91, 106, 91)
-        x = self.conv_block_2(x)  # (1, 91, 106, 91) -> (3, 91, 106, 91)
-        x = self.conv_block_3(x)  # (1, 91, 106, 91) -> (3, 91, 106, 91)
-        x = self.flatten(x)  # Aplana para 2D spatial (3, 106, 91)
-        x = self.adaptive_pool(x)  # (3, 106, 91) -> (3, 244, 244)
+        x = self.conv_block_1(x)  
+        x = self.conv_block_2(x)  
+        x = self.conv_block_3(x)  
+        x = self.flatten(x)  
+        x = self.adaptive_pool(x)  
         return x
 
 class CustomEfficientNet(nn.Module):

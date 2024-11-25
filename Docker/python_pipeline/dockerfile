@@ -1,0 +1,14 @@
+FROM python:3.12.4
+
+WORKDIR /app
+
+COPY requirements.txt .
+
+#Cambiar esto dependiendo de la maquina
+RUN pip install torch torchvision --index-url https://download.pytorch.org/whl/rocm6.2
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY utils ./utils
+COPY pipeline.py .
+
+CMD [ "python", "pipeline.py" ]

@@ -5,3 +5,8 @@ services:
       context: ./fsl
       dockerfile: dockerfile
     image: fsl/parkinson_pipeline
+  pipeline:
+    build:
+      context: ../
+      dockerfile: Docker/python_pipeline/dockerfile
+    image: python/parkinson_pipeline
