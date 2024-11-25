@@ -33,6 +33,7 @@ def train_func(model: nn.Module, data: torch.utils.data.DataLoader, loss_fn:nn.M
         all_labels.extend(y.cpu().numpy())
     train_loss = train_loss / len(data)
     train_acc = train_acc / len(data)
+    
     return train_loss, train_acc, all_preds, all_labels
 
 

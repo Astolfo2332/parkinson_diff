@@ -95,5 +95,13 @@ def load_data(output_path: str, batch_size: int, train: int = 0.7, transform=Non
     train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
     test_loader = DataLoader(test_dataset, batch_size=batch_size, shuffle=True)
 
+    dataset_info(train_dataset, "entrenamiento")
+    dataset_info(test_dataset, "prueba")
+
     return train_loader, test_loader
 
+def dataset_info(dataset, msg):
+    contador = {0: 0, 1: 0}
+    for _, label in dataset:
+        contador[label] += 1
+    print(f"Conteo de etiquetas en {msg}: {contador}")

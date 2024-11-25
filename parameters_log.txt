@@ -1,0 +1,32 @@
+//Test 1
+
+// {
+//     "epochs": [15],
+        "batches" : 8,
+//     "optimizers": ["Adam", "SGD", "Adamw"],
+//     "models": ["custom_effntb0", "custom_effntb2", "custom_convnextTiny", "custom_convnextSmall"
+//     , "custom_resnet50", "custom_resnet101", "custom_resnet152"],
+
+// }
+
+
+Test 2
+
+{
+    "epochs": [50, 100, 150],
+    "batches" : 4,
+    "optimizers": ["Adam"],
+    "models": ["custom_resnet152", "custom_resnet101", "custom_effntb2"],
+    "aditionals" : ["no_augmentation", "no_all_data"]
+
+}
+
+Test 3
+{
+    "epochs": [50, 100, 150],
+    "batches" : 4,
+    "optimizers": ["Adam"],
+    "models": ["custom_resnet152", "custom_resnet101", "custom_effntb2"],
+    "aditionals" : ["no_augmentation", "no_all_data"]
+
+}

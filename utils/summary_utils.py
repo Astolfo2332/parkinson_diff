@@ -8,8 +8,10 @@ from tqdm.auto import tqdm
 from datetime import datetime
 from utils.engine import train_func, test_func
 import matplotlib.pyplot as plt
-from sklearn.metrics import confusion_matrix
+from sklearn.metrics import confusion_matrix, f1_score, roc_curve, auc, recall_score
 import seaborn as sns
+
+
 
 def plot_confusion_matrix(cm, class_names,title):
     """
@@ -23,6 +25,18 @@ def plot_confusion_matrix(cm, class_names,title):
     plt.close(fig)
     return fig
 
+def plot_roc_curve(fpr, tpr, roc_auc):
+    fig = plt.figure()
+    plt.plot(fpr, tpr, color='darkorange', lw=2, label=f'ROC curve (area = {roc_auc:0.2f})')
+    plt.plot([0, 1], [0, 1], color='navy', lw=2, linestyle='--')
+    plt.xlim([0.0, 1.0])
+    plt.ylim([0.0, 1.05])
+    plt.xlabel('False Positive Rate')
+    plt.ylabel('True Positive Rate')
+    plt.title('Receiver Operating Characteristic')
+    plt.legend(loc="lower right")
+    plt.close()
+    return fig
 
 def train_func_profiler(model: nn.Module, data: DataLoader, loss_fn:nn.Module,
                optimizer: torch.optim.Optimizer, device: torch.device
@@ -118,19 +132,30 @@ def train(model: nn.Module, test_data: DataLoader, train_data: DataLoader, loss_
             model,train_data,loss_fn,optimizer, device)
         test_loss, test_acc, test_preds, test_labels = test_func(
             model, test_data, loss_fn, device)
+        
+        train_f1 = f1_score(train_labes, train_preds, average="weighted")
+        test_f1 = f1_score(test_labels, test_preds, average="weighted")
+        train_recall = recall_score(train_labes, train_preds, average="weighted")
+        test_recall = recall_score(test_labels, test_preds, average="weighted")
+
+
         print(
             f"Epoch {epoch+1} |"
             f"train_loss :{train_loss: .4f} |"
             f"train_acc :{train_acc: .4f} |"
             f"test_loss :{test_loss: .4f} |"
-            f"test_acc :{test_acc: .4f} "
+            f"test_acc :{test_acc: .4f} |"
+            f"train_f1_w :{train_f1: .4f} |"
+            f"test_f1_w :{test_f1: .4f} |"
+            f"train_recall :{train_recall: .4f} |"
+            f"test_recall :{test_recall: .4f} "
         )
         results["train_loss"].append(train_loss)
         results["train_acc"].append(train_acc)
         results["test_loss"].append(test_loss)
         results["test_acc"].append(test_acc)
 
-
+        
 
         ##Add of the writer
         if writer:
@@ -143,19 +168,37 @@ def train(model: nn.Module, test_data: DataLoader, train_data: DataLoader, loss_
             tag_scalar_dict={"train_acc": train_acc, "tests_acc": test_acc},
             global_step=epoch
             )
+
+            writer.add_scalars(main_tag="F1_weighted", 
+            tag_scalar_dict={"train_f1_w": train_f1, "tests_f1_w": test_f1},
+            global_step=epoch
+            )
+
+            writer.add_scalars(main_tag="Recall_weighted",
+            tag_scalar_dict={"train_recall": train_recall, "tests_recall": test_recall},
+            global_step=epoch
+            )
+
+            #Confusion matrix
             if epoch == epochs - 1:
                 cm = confusion_matrix(test_preds, test_labels)
                 cm_fig = plot_confusion_matrix(cm, ["Control", "Parkinson"], title)
                 writer.add_figure("Confusion Matrix", cm_fig, global_step=epoch)
 
-            writer.close()
+                #Roc curve
+                fpr, tpr, _ = roc_curve(train_labes, train_preds)
+                roc_auc = auc(fpr, tpr)
+                roc_fig = plot_roc_curve(fpr, tpr, roc_auc)
+                writer.add_figure("ROC Curve", roc_fig, global_step=epoch)
+                writer.close()
+        
         # Para guardar el mejor modelo
         if test_acc > best_test_acc and train_loss < best_train_loss:
             best_test_acc = train_acc
             best_train_loss = train_loss
             best_model = model.state_dict()
 
-    return results, best_model, best_test_acc, cm_fig, train_loss
+    return results, best_model, best_test_acc, cm_fig, test_loss
 
 def create_write(name: str, model: str, experiment_name: str,extra: str=None) -> SummaryWriter():
 
