@@ -1,6 +1,6 @@
 # Parkinson's MRI Classification Using Deep Learning
 
-This project uses transfer learning techniques to classify patients with Parkinson's disease based on 2D slices of MRI images. By leveraging pre-trained convolutional neural networks (CNNs), the project aims to deliver a high-performance solution for early and accurate diagnosis of Parkinson's disease.
+This project uses transfer learning techniques to classify patients with Parkinson's disease based compresing 3D images into 2D using CCNs and leveraging pre-trained convolutional neural networks (CNNs), the project aims to deliver a high-performance solution for early and accurate diagnosis of Parkinson's disease.
 
 ## Key Features
 - MRI Preprocessing Pipeline: Ensures clean and standardized input for model training using FSL.
